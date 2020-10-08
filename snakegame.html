@@ -1,0 +1,79 @@
+<canvas id="gc" width="400" height="400"><canvas>
+<script>
+window.onload = (() => {
+    canvas = document.getElementById("gc");
+    ctx = canvas.getContext("2d");
+    document.addEventListener("keydown", keyDown);
+    setInterval(game, 1000/15);
+})
+
+// Game variables
+let positionX=positionY = 10; // Default position for snake
+let velX=velY = 0; // Current velocity for each direction (-1 moving towards origin, 0 not moving, 1 moving away from origin)
+let gridLength=20; // Grid length is 20 for both X and Y, not making x and y because it will hold the same value
+let trail = []; // Array for the positions of all snake parts
+let snakeLength = 5; // Default length of snake
+let appleX=appleY=15; // Apple position
+
+const game = (() => {
+    // Fill canvas background black
+    ctx.fillStyle="black";
+    ctx.fillRect(0,0,canvas.width, canvas.height);
+
+    // Move player by current velocity for each axis
+    positionX+=velX;
+    positionY+=velY;
+
+    // Wrap X
+    if (positionX > gridLength-1) positionX = 0;
+    if (positionX < 0) positionX = gridLength - 1;
+
+    // Wrap Y
+    if (positionY > gridLength -1) positionY = 0;
+    if (positionY < 0) positionY = gridLength -1;
+
+    // Draw the snake
+    ctx.fillStyle="lime";
+    for (let i = 0; i < trail.length; i++) {
+        ctx.fillRect(trail[i].x*gridLength, trail[i].y*gridLength, gridLength-2, gridLength-2); // Width and Height of tile is also the same as grid length relative to canvas size
+        if (trail[i].x == positionX && trail[i].y == positionY) snakeLength = 5; // If head collides with body
+    }
+
+    trail.push({x: positionX, y: positionY}); // Add head position to end of body array
+    while (trail.length > snakeLength) trail.shift(); // Remove first element from snake as long as body is longer than 5
+
+    // Draw apple
+    ctx.fillStyle="red";
+    ctx.fillRect(appleX*gridLength, appleY*gridLength, gridLength-2, gridLength-2);
+
+    // Collision with apple
+    if (positionX == appleX && positionY == appleY) {
+        snakeLength++;
+        appleX = Math.floor(Math.random() * gridLength);
+        appleY = Math.floor(Math.random() * gridLength);
+    }
+})
+
+const keyDown = ((evt) => {
+    switch(evt.keyCode) {
+        case 37: // Left
+            velX=-1;
+            velY=0;
+            break;
+        case 38: // Up
+            velX=-0;
+            velY=-1;
+            break;
+        case 39: // Right
+            velX=1;
+            velY=0;
+            break;
+        case 40: // Down
+            velX=0;
+            velY=1;
+            break;
+    }
+})
+
+
+</script>
